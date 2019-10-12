@@ -10,7 +10,10 @@ SCREEN_HEIGHT = 256
 SCREEN_TITLE = "Perlin noise"
 TILE_SIZE = 4
 NOISE_FREQ = 1/50
-NOISE_SATURATION = 500
+NOISE_INCR = 0.02
+COLOR_MIN_VALUE = 0
+COLOR_MAX_VALUE = 255
+COLOR_SATURATION = 500
 
 """
 Class Noise
@@ -94,12 +97,9 @@ class Demo(arcade.Window):
 	def setup(self, freq):
 		self.noise = Noise()
 		self.z = 0
-		point_list = []
 		size = self.tile_size
-		for y in range(0, self.height, size):
-			for x in range(0, self.width, size):
-				point_list.extend([(x,y),(x+size,y),(x+size,y+size),(x,y+size)])
-		self.point_list = point_list
+		# precompute list of tiles = f(size) and list of noise coords * freq
+		self.point_list = [(x+dx,y+dy)for y in range(0, self.height, size) for x in range(0, self.width, size) for (dx, dy) in [(0,0),(size,0),(size, size),(0, size)]]
 		self.coord_list = [(x*freq, y*freq) for y in range(0, self.height, size) for x in range(0, self.width, size)]
 
 	def on_draw(self):
@@ -110,10 +110,10 @@ class Demo(arcade.Window):
 		color_list = []
 		z = self.z
 		for (x,y) in self.coord_list:
-			col = Demo.clamp(int(abs(self.noise(x, y, z)) * NOISE_SATURATION), 0, 255)
+			col = Demo.clamp(int(abs(self.noise(x, y, z)) * COLOR_SATURATION), COLOR_MIN_VALUE, COLOR_MAX_VALUE)
 			color_list.extend([(col,col,col)]*4)
 		self.color_list = color_list
-		self.z += 0.02
+		self.z += NOISE_INCR
 
 if __name__ == '__main__':
 	game = Demo(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, TILE_SIZE)
