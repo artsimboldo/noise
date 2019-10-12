@@ -79,11 +79,11 @@ class Noise():
 
 
 """
-Class Demo
+Class NoiseDemo
 arcade.Window base class
 Noise graphics representation for demoing
 """
-class Demo(arcade.Window):
+class NoiseDemo(arcade.Window):
 	def __init__(self, width, height, title, tile_size):
 		super().__init__(width, height, title)
 		self.width = width
@@ -110,12 +110,12 @@ class Demo(arcade.Window):
 		color_list = []
 		z = self.z
 		for (x,y) in self.coord_list:
-			col = Demo.clamp(int(abs(self.noise(x, y, z)) * COLOR_SATURATION), COLOR_MIN_VALUE, COLOR_MAX_VALUE)
+			col = NoiseDemo.clamp(int(abs(self.noise(x, y, z)) * COLOR_SATURATION), COLOR_MIN_VALUE, COLOR_MAX_VALUE)
 			color_list.extend([(col,col,col)]*4)
 		self.color_list = color_list
 		self.z += NOISE_INCR
 
 if __name__ == '__main__':
-	game = Demo(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, TILE_SIZE)
+	game = NoiseDemo(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, TILE_SIZE)
 	game.setup(NOISE_FREQ)
 	arcade.run()
