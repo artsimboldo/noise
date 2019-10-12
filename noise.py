@@ -1,12 +1,16 @@
 import math
+import numpy as np
 import arcade
 
-SCREEN_WIDTH = 512
-SCREEN_HEIGHT = 512
-SCREEN_TITLE = "noise"
-TILE_SIZE = 8
+"""
+Globals constants
+"""
+SCREEN_WIDTH = 256
+SCREEN_HEIGHT = 256
+SCREEN_TITLE = "Perlin noise"
+TILE_SIZE = 4
 NOISE_FREQ = 1/50
-NOISE_MAGNITUDE = 500
+NOISE_SATURATION = 500
 
 """
 Class Noise
@@ -29,7 +33,7 @@ NOISE_PERMUTATION = [151,160,137,91,90,15,
 
 class Noise():
 	def __init__(self):
-		self.p = [NOISE_PERMUTATION[i] for i in range(256)] * 2
+		self.p = np.array(NOISE_PERMUTATION*2, dtype=int)
 
 	@staticmethod
 	def fade(t):
@@ -83,6 +87,10 @@ class Demo(arcade.Window):
 		self.height = height
 		self.tile_size = tile_size
 
+	@staticmethod
+	def clamp(value, min_value, max_value):
+		return max(min(value, max_value), min_value)
+
 	def setup(self, freq):
 		self.noise = Noise()
 		self.z = 0
@@ -100,8 +108,9 @@ class Demo(arcade.Window):
 
 	def on_update(self, delta_time):
 		color_list = []
+		z = self.z
 		for (x,y) in self.coord_list:
-			col = max(min(int(abs(self.noise(x, y, self.z)) * NOISE_MAGNITUDE), 255), 0)
+			col = Demo.clamp(int(abs(self.noise(x, y, z)) * NOISE_SATURATION), 0, 255)
 			color_list.extend([(col,col,col)]*4)
 		self.color_list = color_list
 		self.z += 0.02
