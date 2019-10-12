@@ -7,6 +7,7 @@ SCREEN_TITLE = "noise"
 TILE_SIZE = 8
 NOISE_FREQ = 1/50
 NOISE_MAGNITUDE = 500
+
 """
 Class Noise
 https://mrl.nyu.edu/~perlin/noise/
@@ -69,6 +70,12 @@ class Noise():
 			Noise.lerp(u, Noise.grad(self.p[AB + 1], x, y - 1, z - 1), 
 			Noise.grad(self.p[BB + 1], x - 1, y - 1, z - 1))))
 
+
+"""
+Class Demo
+arcade.Window base class
+Noise graphics representation for demoing
+"""
 class Demo(arcade.Window):
 	def __init__(self, width, height, title, tile_size):
 		super().__init__(width, height, title)
