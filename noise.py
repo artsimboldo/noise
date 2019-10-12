@@ -1,13 +1,18 @@
 import math
+import time
 import arcade
+
+SCREEN_WIDTH = 128
+SCREEN_HEIGHT = 128
+SCREEN_TITLE = "noise"
+NOISE_FREQ = 1/20
 
 """
 Class Noise
 https://mrl.nyu.edu/~perlin/noise/
 http://zreference.com/canvas-perlin-noise/
 """
-
-PERMUTATION = [151,160,137,91,90,15,
+NOISE_PERMUTATION = [151,160,137,91,90,15,
 	131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
 	190, 6,148,247,120,234,75,0,26,197,62,94,252,219,203,117,35,11,32,57,177,33,
 	88,237,149,56,87,174,20,125,136,171,168, 68,175,74,165,71,134,139,48,27,166,
@@ -23,7 +28,7 @@ PERMUTATION = [151,160,137,91,90,15,
 
 class Noise():
 	def __init__(self):
-		self.p = [PERMUTATION[i] for i in range(256)] * 2
+		self.p = [NOISE_PERMUTATION[i] for i in range(256)] * 2
 
 	@staticmethod
 	def fade(t):
@@ -64,37 +69,35 @@ class Noise():
 			Noise.lerp(u, Noise.grad(self.p[AB + 1], x, y - 1, z - 1), 
 			Noise.grad(self.p[BB + 1], x - 1, y - 1, z - 1))))
 
-SCREEN_WIDTH = 128
-SCREEN_HEIGHT = 128
+class Demo(arcade.Window):
+	def __init__(self, width, height, title):
+		super().__init__(width, height, title)
+		self.width = width
+		self.height = height
+
+	def setup(self, freq):
+		self.noise = Noise()
+		self.z = 0
+		point_list = []
+		for y in range(self.height):
+			for x in range(self.width):
+				point_list.extend([(x,y),(x+1,y),(x+1,y+1),(x,y+1)])
+		self.point_list = point_list
+		self.coord_list = [(x*freq, y*freq) for y in range(self.height) for x in range(self.width)]
+
+	def on_draw(self):
+		arcade.start_render()
+		arcade.create_rectangles_filled_with_colors(self.point_list, self.color_list).draw()
+
+	def on_update(self, delta_time):
+		self.z += 0.02
+		color_list = []
+		for (x,y) in self.coord_list:
+			col = int(abs(self.noise(x, y, self.z)) * 400)
+			color_list.extend((col,col,col) for _ in range(4))
+		self.color_list = color_list
 
 if __name__ == '__main__':
-	arcade.open_window(SCREEN_WIDTH, SCREEN_HEIGHT, "Noise")
-	arcade.set_background_color(arcade.color.BLACK)
-
-	noise = Noise()
-	freq = 1/20
-	z = 0
-
-	point_list = []
-	for y in range(SCREEN_HEIGHT):
-		for x in range(SCREEN_WIDTH):
-			point_list.extend([(x,y),(x+1,y),(x+1,y+1),(x,y+1)])
-
-	coord_list = [(x*freq, y*freq) for y in range(SCREEN_HEIGHT) for x in range(SCREEN_WIDTH)]
-
-	# loop
-	arcade.start_render()
-	for _ in range(10):
-		z += 0.02
-		color_list = []
-		for (x,y) in coord_list:
-			col = int(abs(noise(x, y, z)) * 400)
-			color_list.extend((col,col,col) for _ in range(4))
-
-		shape = arcade.create_rectangles_filled_with_colors(point_list, color_list)
-		shape_list = arcade.ShapeElementList()
-		shape_list.append(shape)
-		shape_list.draw()
-		arcade.finish_render()
-
+	game = Demo(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+	game.setup(NOISE_FREQ)
 	arcade.run()
