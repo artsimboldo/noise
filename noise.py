@@ -89,12 +89,12 @@ class Demo(arcade.Window):
 		arcade.create_rectangles_filled_with_colors(self.point_list, self.color_list).draw()
 
 	def on_update(self, delta_time):
-		self.z += 0.02
 		color_list = []
 		for (x,y) in self.coord_list:
 			col = int(abs(self.noise(x, y, self.z)) * 400)
 			color_list.extend((col,col,col) for _ in range(4))
 		self.color_list = color_list
+		self.z += 0.02
 
 if __name__ == '__main__':
 	game = Demo(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
