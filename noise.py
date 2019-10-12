@@ -1,5 +1,4 @@
 import math
-import time
 import arcade
 
 SCREEN_WIDTH = 128
