@@ -1,11 +1,12 @@
 import math
 import arcade
 
-SCREEN_WIDTH = 128
-SCREEN_HEIGHT = 128
+SCREEN_WIDTH = 512
+SCREEN_HEIGHT = 512
 SCREEN_TITLE = "noise"
-NOISE_FREQ = 1/20
-
+TILE_SIZE = 8
+NOISE_FREQ = 1/50
+NOISE_MAGNITUDE = 500
 """
 Class Noise
 https://mrl.nyu.edu/~perlin/noise/
@@ -69,20 +70,22 @@ class Noise():
 			Noise.grad(self.p[BB + 1], x - 1, y - 1, z - 1))))
 
 class Demo(arcade.Window):
-	def __init__(self, width, height, title):
+	def __init__(self, width, height, title, tile_size):
 		super().__init__(width, height, title)
 		self.width = width
 		self.height = height
+		self.tile_size = tile_size
 
 	def setup(self, freq):
 		self.noise = Noise()
 		self.z = 0
 		point_list = []
-		for y in range(self.height):
-			for x in range(self.width):
-				point_list.extend([(x,y),(x+1,y),(x+1,y+1),(x,y+1)])
+		size = self.tile_size
+		for y in range(0, self.height, size):
+			for x in range(0, self.width, size):
+				point_list.extend([(x,y),(x+size,y),(x+size,y+size),(x,y+size)])
 		self.point_list = point_list
-		self.coord_list = [(x*freq, y*freq) for y in range(self.height) for x in range(self.width)]
+		self.coord_list = [(x*freq, y*freq) for y in range(0, self.height, size) for x in range(0, self.width, size)]
 
 	def on_draw(self):
 		arcade.start_render()
@@ -91,12 +94,12 @@ class Demo(arcade.Window):
 	def on_update(self, delta_time):
 		color_list = []
 		for (x,y) in self.coord_list:
-			col = int(abs(self.noise(x, y, self.z)) * 400)
-			color_list.extend((col,col,col) for _ in range(4))
+			col = max(min(int(abs(self.noise(x, y, self.z)) * NOISE_MAGNITUDE), 255), 0)
+			color_list.extend([(col,col,col)]*4)
 		self.color_list = color_list
 		self.z += 0.02
 
 if __name__ == '__main__':
-	game = Demo(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
+	game = Demo(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, TILE_SIZE)
 	game.setup(NOISE_FREQ)
 	arcade.run()
