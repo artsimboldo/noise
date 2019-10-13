@@ -11,9 +11,10 @@ SCREEN_TITLE = "Perlin noise"
 TILE_SIZE = 4
 NOISE_FREQ = 1/50
 NOISE_INCR = 0.02
+COLOR_BASE = (0,70,100)
 COLOR_MIN_VALUE = 0
 COLOR_MAX_VALUE = 255
-COLOR_SATURATION = 500
+COLOR_SATURATION = 200
 
 """
 Class Noise
@@ -45,28 +46,33 @@ class Noise():
 	@staticmethod
 	def lerp(t, a, b):
 		return a + t * (b - a)
-   
+
 	@staticmethod
 	def grad(hash, x, y, z):
-		h = hash & 15
-		u = x if h < 8 else y
+		h = hash & 15			# Convert lo 4 bits of hash code
+		u = x if h < 8 else y 	# into 12 gradient directions.
 		v = y if h < 4 else x if (h == 12 or h == 14) else z
-		return (u if (h & 1) == 0 else -u + v if (h & 2) == 0 else -v)
+		return (u if (h&1) == 0 else -u + v if (h&2) == 0 else -v)
 
 	def __call__(self, x, y, z):
+		# Find unit cube that contains point.
 		X = math.floor(x) & 255
 		Y = math.floor(y) & 255
 		Z = math.floor(z) & 255
+		# Find relative X,Y,Z of point in cube.
 		x -= math.floor(x)
 		y -= math.floor(y)
 		z -= math.floor(z)
+		# Compute fade curves for each X,Y,Z
 		u, v, w = Noise.fade(x), Noise.fade(y), Noise.fade(z)
+		# Hash coordinates of  the 8 cube corners
 		A  = self.p[X] + Y
 		AA = self.p[A] + Z
 		AB = self.p[A + 1] + Z
 		B  = self.p[X + 1] + Y
 		BA = self.p[B] + Z
 		BB = self.p[B + 1] + Z
+		# and add blended results from 8 corners of cube
 		return Noise.lerp(w, Noise.lerp(v, Noise.lerp(u, 
 			Noise.grad(self.p[AA], x, y, z), 
 			Noise.grad(self.p[BA], x - 1, y, z)),
@@ -76,7 +82,6 @@ class Noise():
 			Noise.grad(self.p[BA + 1], x - 1, y, z - 1)), 
 			Noise.lerp(u, Noise.grad(self.p[AB + 1], x, y - 1, z - 1), 
 			Noise.grad(self.p[BB + 1], x - 1, y - 1, z - 1))))
-
 
 """
 Class NoiseDemo
@@ -108,10 +113,11 @@ class NoiseDemo(arcade.Window):
 
 	def on_update(self, delta_time):
 		color_list = []
+		(r,g,b) = COLOR_BASE
 		z = self.z
 		for (x,y) in self.coord_list:
 			col = NoiseDemo.clamp(int(abs(self.noise(x, y, z)) * COLOR_SATURATION), COLOR_MIN_VALUE, COLOR_MAX_VALUE)
-			color_list.extend([(col,col,col)]*4)
+			color_list.extend([(r+col,g+col,b+col)]*4)
 		self.color_list = color_list
 		self.z += NOISE_INCR
 
