@@ -14,7 +14,7 @@ NOISE_INCR = 0.02
 COLOR_BASE = (0,70,100)
 COLOR_MIN_VALUE = 0
 COLOR_MAX_VALUE = 255
-COLOR_SATURATION = 200
+COLOR_SATURATION = 300
 
 """
 Class Noise
@@ -37,7 +37,7 @@ NOISE_PERMUTATION = [151,160,137,91,90,15,
 
 class Noise():
 	def __init__(self):
-		self.p = np.array(NOISE_PERMUTATION*2, dtype=int)
+		self.p = np.array(NOISE_PERMUTATION*2, dtype=np.int)
 
 	@staticmethod
 	def fade(t):
@@ -113,11 +113,13 @@ class NoiseDemo(arcade.Window):
 
 	def on_update(self, delta_time):
 		color_list = []
-		(r,g,b) = COLOR_BASE
 		z = self.z
 		for (x,y) in self.coord_list:
-			col = NoiseDemo.clamp(int(abs(self.noise(x, y, z)) * COLOR_SATURATION), COLOR_MIN_VALUE, COLOR_MAX_VALUE)
-			color_list.extend([(r+col,g+col,b+col)]*4)
+			col = int(abs(self.noise(x, y, z)) * COLOR_SATURATION)
+			r = NoiseDemo.clamp(COLOR_BASE[0] + col, COLOR_MIN_VALUE, COLOR_MAX_VALUE)
+			g = NoiseDemo.clamp(COLOR_BASE[1] + col, COLOR_MIN_VALUE, COLOR_MAX_VALUE)
+			b = NoiseDemo.clamp(COLOR_BASE[2] + col, COLOR_MIN_VALUE, COLOR_MAX_VALUE)
+			color_list.extend([(r,g,b)]*4)
 		self.color_list = color_list
 		self.z += NOISE_INCR
 
