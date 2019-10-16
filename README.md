@@ -2,5 +2,5 @@
 python implementation of noise functions
 
 ## Result
-![](results/noise#004664.PNG)
+![](results/noise004664.PNG)
 
