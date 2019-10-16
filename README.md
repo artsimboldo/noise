@@ -1,5 +1,6 @@
 # Noise
-Python 3,7 implementation of a Perlin noise function.
+Python 3.7 implementation of a Perlin noise function.
+Requires numpy.
 
 ## Instructions
 ```
