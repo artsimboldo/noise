@@ -6,7 +6,7 @@ Python 3,7 implementation of a Perlin noise function.
 pip install arcade
 python noise.py
 ```
-### Variables (modify in nois.py):
+#### Variables (modify in noise.py):
 ```
 TILE_SIZE : tile size in pixels
 NOISE_FREQ : noise frequency
